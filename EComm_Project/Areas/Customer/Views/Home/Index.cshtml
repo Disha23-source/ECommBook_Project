@@ -1,0 +1,33 @@
+﻿@model IEnumerable<EComm_Project_Models.Product>
+
+<div class="book-container py-5">
+    <div class="container">
+        <!-- Using Bootstrap's grid with custom gutter spacing -->
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+            @foreach (var product in Model)
+            {
+                <div class="col">
+                    <div class="modern-book-card">
+                        <div class="book-img-wrapper">
+                            <img src="@product.ImageUrl" class="book-img" alt="@product.Title" />
+                        </div>
+
+                        <div class="book-info">
+                            <h2 class="book-title">@product.Title</h2>
+                            <p class="book-author">by @product.Author</p>
+
+                            <div class="price-section">
+                                <span class="list-price">$@product.ListPrice.ToString("0.00")</span>
+                                <span class="current-price">$@product.Price100.ToString("0.00")</span>
+                            </div>
+
+                            <a asp-action="Details" asp-route-productId="@product.Id" class="btn btn-modern-action">
+                                View Product
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>

@@ -1,0 +1,30 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <!--<Nullable>enable</Nullable>-->
+  </PropertyGroup>
+	
+	<ItemGroup>
+		<PackageReference Include="AspNet.Security.OAuth.LinkedIn" Version="10.0.0" />
+		<PackageReference Include="GoogleAuthenticator" Version="3.2.0" />
+		<PackageReference Include="Microsoft.AspNetCore.Authentication.Facebook" Version="10.0.2" />
+		<PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="10.0.2" />
+		<PackageReference Include="Microsoft.AspNetCore.Authentication.Twitter" Version="10.0.2" />
+		<PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="10.0.2" />
+		<PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="10.0.2" />
+		<PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="10.0.2" />
+		<PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="10.0.2" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.2" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.2" />
+		<PackageReference Include="Razorpay" Version="3.3.2" />
+		<PackageReference Include="Twilio" Version="7.14.7" />
+	</ItemGroup>
+	
+	<ItemGroup>
+	  <ProjectReference Include="..\EComm_Project_Models\EComm_Project_Models.csproj" />
+	  <ProjectReference Include="..\EComm_Project_Utility\EComm_Project_Utility.csproj" />
+	</ItemGroup>
+	
+</Project>

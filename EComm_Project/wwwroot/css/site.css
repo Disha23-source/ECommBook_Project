@@ -1,0 +1,649 @@
+html {
+  font-size: 14px;
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+}
+
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+  margin-bottom: 60px;
+}
+
+.form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
+  color: var(--bs-secondary-color);
+  text-align: end;
+}
+
+.form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
+  text-align: start;
+}
+
+/* Add this to your wwwroot/css/site.css */
+:root {
+    --text-main: #1a1a1a;
+    --text-muted: #6b7280;
+    --accent-gold: #b8926a; /* Sophisticated gold/bronze accent */
+    --card-bg: #ffffff;
+}
+
+.book-container {
+    padding: 2rem 0;
+    background-color: #fdfdfd; /* Off-white background for a "paper" feel */
+}
+
+.book-card {
+    border: none;
+    background: transparent;
+    transition: transform 0.3s ease;
+    height: 100%;
+}
+
+    .book-card:hover {
+        transform: translateY(-5px);
+    }
+
+/* Elegant Image Shadow (Book-like) */
+.book-img-wrapper {
+    position: relative;
+    padding-top: 150%; /* 2:3 Book Aspect Ratio */
+    overflow: hidden;
+    border-radius: 4px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08); /* Soft, natural shadow */
+    transition: box-shadow 0.3s ease;
+    background-color: #f8f8f8;
+}
+
+.book-card:hover .book-img-wrapper {
+    box-shadow: 0 12px 24px rgba(0,0,0,0.15);
+}
+
+.book-img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.book-info {
+    padding-top: 1.25rem;
+    text-align: center; /* Centered text is often more elegant for books */
+}
+
+.book-title {
+    font-family: 'Playfair Display', serif; /* Optional: Use a serif font for that "literary" look */
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--text-main);
+    line-height: 1.3;
+    margin-bottom: 0.25rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.book-author {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    font-style: italic;
+    margin-bottom: 0.75rem;
+}
+
+.price-section {
+    margin-bottom: 1rem;
+}
+
+.current-price {
+    color: #d94343; /* Classic sale red, but muted */
+    font-weight: 700;
+    font-size: 1.1rem;
+}
+
+.list-price {
+    font-size: 0.85rem;
+    color: #999;
+    text-decoration: line-through;
+    margin-right: 5px;
+}
+
+.btn-details {
+    background-color: var(--text-main);
+    color: white;
+    border-radius: 0; /* Professional sharp edges */
+    font-size: 0.75rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 8px 20px;
+    transition: background 0.3s;
+}
+
+    .btn-details:hover {
+        background-color: var(--accent-gold);
+        color: white;
+    }
+.month-dropdown-btn {
+    background: linear-gradient(135deg, #1a1f5e, #1565c0);
+    color: white;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 30px;
+    font-weight: 700;
+    font-size: 0.85rem;
+    box-shadow: 0 4px 12px rgba(21,101,192,0.35);
+    transition: all 0.2s;
+}
+
+    .month-dropdown-btn:hover {
+        background: linear-gradient(135deg, #1565c0, #1a1f5e);
+        color: white;
+        transform: translateY(-1px);
+        box-shadow: 0 6px 16px rgba(21,101,192,0.45);
+    }
+
+    .month-dropdown-btn::after {
+        margin-left: 8px;
+    }
+
+.dropdown-menu {
+    border: none;
+    border-radius: 14px;
+    padding: 8px;
+    min-width: 180px;
+}
+
+.dropdown-item {
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    padding: 8px 14px;
+    color: #334155;
+    transition: all 0.15s;
+}
+
+    .dropdown-item:hover {
+        background: #eff6ff;
+        color: #1565c0;
+    }
+
+    .dropdown-item.active {
+        background: linear-gradient(135deg, #1a1f5e, #1565c0) !important;
+        color: white !important;
+    }
+/************************************************/
+.filter-card {
+    background: #1a7fa8;
+    border-radius: 6px;
+    padding: 20px 24px;
+    margin-bottom: 24px;
+    color: white;
+}
+
+.filter-card h5 {
+    font-weight: 700;
+    margin-bottom: 16px;
+    font-size: 1rem;
+}
+
+.month-dropdown-btn {
+    background: white;
+    color: #1a7fa8;
+    border: none;
+    padding: 8px 22px;
+    border-radius: 4px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    min-width: 220px;
+    text-align: left;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+    .month-dropdown-btn:hover {
+        background: #f0f9ff;
+        color: #1a7fa8;
+    }
+
+.dropdown-menu {
+    border: none;
+    border-radius: 6px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+    padding: 6px;
+    min-width: 220px;
+}
+
+.dropdown-item {
+    border-radius: 4px;
+    font-size: 0.87rem;
+    font-weight: 600;
+    padding: 8px 14px;
+    color: #334155;
+    transition: all 0.15s;
+}
+
+    .dropdown-item:hover {
+        background: #e0f2fe;
+        color: #1a7fa8;
+    }
+
+    .dropdown-item.active {
+        background: #1a7fa8 !important;
+        color: white !important;
+    }
+
+/* Stats */
+.stats-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    overflow: hidden;
+    margin-bottom: 24px;
+    background: white;
+}
+
+.stat-box {
+    padding: 20px 24px;
+    text-align: center;
+    border-right: 1px solid #e5e7eb;
+    position: relative;
+}
+
+    .stat-box:last-child {
+        border-right: none;
+    }
+
+    .stat-box::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 15%;
+        bottom: 15%;
+        width: 4px;
+        border-radius: 0 4px 4px 0;
+    }
+
+    .stat-box.blue::before {
+        background: #3b82f6;
+    }
+
+    .stat-box.green::before {
+        background: #22c55e;
+    }
+
+    .stat-box.yellow::before {
+        background: #eab308;
+    }
+
+    .stat-box.red::before {
+        background: #ef4444;
+    }
+
+.stat-label {
+    color: #9ca3af;
+    font-size: 0.82rem;
+    font-weight: 500;
+    margin-bottom: 6px;
+}
+
+.stat-value.blue {
+    color: #3b82f6;
+    font-size: 1.6rem;
+    font-weight: 800;
+}
+
+.stat-value.green {
+    color: #22c55e;
+    font-size: 1.6rem;
+    font-weight: 800;
+}
+
+.stat-value.yellow {
+    color: #eab308;
+    font-size: 1.6rem;
+    font-weight: 800;
+}
+
+.stat-value.red {
+    color: #ef4444;
+    font-size: 1.6rem;
+    font-weight: 800;
+}
+
+/* Table */
+.table-header-bar {
+    background: #1a7fa8;
+    color: white;
+    padding: 12px 20px;
+    border-radius: 6px 6px 0 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.orders-found-badge {
+    background: rgba(255,255,255,0.2);
+    border: 1px solid rgba(255,255,255,0.3);
+    color: white;
+    padding: 3px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.month-tag {
+    background: rgba(255,255,255,0.25);
+    border: 1px solid rgba(255,255,255,0.35);
+    color: white;
+    padding: 3px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin-left: 8px;
+}
+
+.table-wrap {
+    border: 1px solid #e5e7eb;
+    border-top: none;
+    border-radius: 0 0 6px 6px;
+    overflow: hidden;
+    background: white;
+}
+
+#monthlyTable thead tr {
+    background: #1a7fa8 !important;
+    color: white;
+}
+
+#monthlyTable thead th {
+    padding: 12px 16px !important;
+    font-size: 0.82rem !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+    border: none !important;
+    color: white !important;
+}
+
+#monthlyTable tbody tr {
+    border-bottom: 1px solid #f1f5f9;
+}
+
+    #monthlyTable tbody tr:hover {
+        background: #f8faff !important;
+    }
+
+#monthlyTable tbody td {
+    padding: 13px 16px !important;
+    font-size: 0.87rem;
+    color: #374151;
+    vertical-align: middle;
+    border: none !important;
+}
+
+.order-id-badge {
+    background: #f1f5f9;
+    color: #475569;
+    padding: 3px 10px;
+    border-radius: 4px;
+    font-weight: 700;
+    font-size: 0.82rem;
+}
+
+.cust-name {
+    font-weight: 700;
+    color: #1e293b;
+}
+
+.email-text {
+    color: #6b7280;
+    font-size: 0.82rem;
+}
+
+.amount-text {
+    font-weight: 700;
+    color: #1e293b;
+}
+
+.badge-status {
+    padding: 4px 12px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    display: inline-block;
+}
+
+.badge-Approved {
+    background: #22c55e;
+    color: white;
+}
+
+.badge-Pending {
+    background: #eab308;
+    color: white;
+}
+
+.badge-Cancelled {
+    background: #ef4444;
+    color: white;
+}
+
+.badge-Processing {
+    background: #3b82f6;
+    color: white;
+}
+
+.badge-Shipped {
+    background: #8b5cf6;
+    color: white;
+}
+
+.badge-PaymentStatusDelay {
+    background: #e5e7eb;
+    color: #374151;
+}
+
+.badge-month {
+    background: #e0f2fe;
+    color: #0369a1;
+}
+
+.btn-view {
+    border: 1px solid #1a7fa8;
+    color: #1a7fa8;
+    background: white;
+    padding: 4px 16px;
+    border-radius: 4px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none;
+    display: inline-block;
+}
+
+    .btn-view:hover {
+        background: #1a7fa8;
+        color: white;
+    }
+
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+}
+
+    .empty-state .icon {
+        font-size: 3rem;
+        margin-bottom: 12px;
+    }
+
+    .empty-state h5 {
+        color: #6b7280;
+        font-weight: 600;
+    }
+
+/* DataTables overrides */
+.dataTables_wrapper .dataTables_filter input {
+    border: 1px solid #e5e7eb;
+    border-radius: 4px;
+    padding: 5px 10px;
+    font-size: 0.85rem;
+    outline: none;
+}
+
+    .dataTables_wrapper .dataTables_filter input:focus {
+        border-color: #1a7fa8;
+        box-shadow: 0 0 0 2px rgba(26,127,168,0.15);
+    }
+
+.dataTables_wrapper .dataTables_length select {
+    border: 1px solid #e5e7eb;
+    border-radius: 4px;
+    padding: 4px 8px;
+    font-size: 0.85rem;
+}
+
+.dataTables_wrapper .dataTables_info {
+    font-size: 0.82rem;
+    color: #9ca3af;
+}
+
+.page-link {
+    color: #1a7fa8 !important;
+}
+
+.page-item.active .page-link {
+    background: #1a7fa8 !important;
+    border-color: #1a7fa8 !important;
+    color: white !important;
+}
+
+/***************************/
+:root {
+    --card-bg: #ffffff;
+    --text-main: #2d3436;
+    --text-muted: #636e72;
+    --accent-red: #d63031;
+    --shadow-soft: 0 10px 25px rgba(0, 0, 0, 0.05);
+    --shadow-hover: 0 20px 35px rgba(0, 0, 0, 0.12);
+}
+
+/* Container Background */
+.book-container {
+    background-color: #f8f9fa;
+    min-height: 100vh;
+}
+
+/* The Card */
+.modern-book-card {
+    background: var(--card-bg);
+    border-radius: 16px;
+    padding: 1.25rem;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid rgba(0,0,0,0.03);
+    box-shadow: var(--shadow-soft);
+}
+
+    .modern-book-card:hover {
+        transform: translateY(-10px);
+        box-shadow: var(--shadow-hover);
+    }
+
+/* Image Handling */
+.book-img-wrapper {
+    width: 100%;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+    aspect-ratio: 2/3; /* Keeps all book covers uniform */
+}
+
+.book-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.modern-book-card:hover .book-img {
+    transform: scale(1.08);
+}
+
+/* Typography */
+.book-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-main);
+    margin-bottom: 0.25rem;
+    /* Limits title to 1 line for alignment */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.book-author {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    font-style: italic;
+    margin-bottom: 1rem;
+}
+
+/* Price Section */
+.price-section {
+    margin-top: auto;
+    padding-bottom: 1.25rem;
+}
+
+.list-price {
+    text-decoration: line-through;
+    color: #b2bec3;
+    font-size: 0.9rem;
+    margin-right: 8px;
+}
+
+.current-price {
+    color: var(--accent-red);
+    font-weight: 800;
+    font-size: 1.25rem;
+}
+
+/* Button Styling */
+.btn-modern-action {
+    background: #1e1e1e;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 0.75rem;
+    transition: background 0.2s ease;
+    width: 100%;
+}
+
+    .btn-modern-action:hover {
+        background: #000;
+        color: #ffd700; /* Subtle gold pop like the "VIEW PRODUCT" text in your image */
+    }

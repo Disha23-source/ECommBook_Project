@@ -1,0 +1,359 @@
+﻿@model EComm_Project_Models.ViewModels.ShoppingCartVM
+@using Microsoft.Extensions.Options
+@inject IOptions<EComm_Project_Utility.StripeSettings> stripe; 
+@inject IOptions<EComm_Project_Utility.PayPalSettings> PayPal;
+
+<form method="post" asp-action="summary" id="paymentForm">
+
+    <div class="backgroundWhiteBorder">
+        <div class="container">
+            <div class="card">
+                <div class="card-header bg-dark text-light ml-0 row container">
+                    <div class="col-6">
+                        <i class="fa fa-shopping-cart"></i> &nbsp;
+                        Order Summary
+                    </div>
+                    <div class="col-6 text-right">
+                        <a asp-action="Index" class="btn btn-outline-info btn-sm">Back to Cart</a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="container rounded p-2">
+                        <div class="row">
+                            <div class="col-12 col-lg-6 pb-4">
+                                <div class="row">
+                                    <h4 class="d-flex justify-content-between align-items-center mb-3">
+                                        <span class="text-info">PickUp Details:</span>
+                                    </h4>
+                                </div>
+
+
+                                <div class="row-cols-3">
+                                    <b>Shipping Address </b>
+                                </div>
+                                @* Address Details *@
+                                <div class="row align-items-center mb-2">
+
+                                    @* CheckBox for live Location *@
+                                    <div class="col-auto">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="useCurrentLocation">
+                                            <label class="form-check-label" for="useCurrentLocation">
+                                                Current Location
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                     @* Dropdown List to select stored address *@
+                                    <div class="col-4 p-1 m-1">
+                                        <select id="addressDropdown" class="form-select">
+                                            <option value="profile"
+                                                    data-name="@Model.OrderHeader.ApplicationUser.Name"
+                                                    data-phone="@Model.OrderHeader.ApplicationUser.PhoneNumber"
+                                                    data-street="@Model.OrderHeader.ApplicationUser.StreetAddress"
+                                                    data-city="@Model.OrderHeader.ApplicationUser.City"
+                                                    data-state="@Model.OrderHeader.ApplicationUser.State"
+                                                    data-postal="@Model.OrderHeader.ApplicationUser.PostalCode">
+                                                Select Address
+                                            </option>
+
+                                            @foreach (var item in Model.UserAddresses)
+                                            {
+                                                <option value="@item.Id"
+                                                        data-name="@Model.OrderHeader.ApplicationUser.Name"
+                                                        data-phone="@Model.OrderHeader.ApplicationUser.PhoneNumber"
+                                                        data-street="@item.StreetAddress"
+                                                        data-city="@item.City"
+                                                        data-state="@item.State"
+                                                        data-postal="@item.PostalCode">
+                                                    @item.AddressTitle - @item.StreetAddress
+                                                </option>
+                                            }
+                                        </select>
+                                    </div>
+
+                                    <!-- Add button -->
+                                    <div class="col-4">
+                                        <a asp-area="Customer" asp-controller="Address" asp-action="Add" class="btn btn-outline-dark">
+                                            <i class="fas fa-plus"></i> New Address
+                                        </a>
+                                    </div>
+
+
+                                </div>
+                                <div class="row my-1">
+                                    <div class="col-3">
+                                        <label>Name</label>
+                                    </div>
+                                    <div class="col-9">
+                                        <input type="text" class="form-control" asp-for="@Model.OrderHeader.Name"/>
+                                    </div>
+                                </div>
+                                <div class="row my-1">
+                                    <div class="col-3">
+                                        <label>Phone</label>
+                                    </div>
+                                    <div class="col-9">
+                                        <input type="text" class="form-control" asp-for="@Model.OrderHeader.PhoneNumber"/>
+                                    </div>
+                                </div>
+              
+                                <div class="row my-1">
+                                    <div class="col-3">
+                                        <label>Street Address</label>
+                                    </div>
+                                    <div class="col-9">
+                                        <input type="text" class="form-control" asp-for="@Model.OrderHeader.StreetAddress"/>
+                                    </div>
+                                </div>
+                                <div class="row my-1">
+                                    <div class="col-3">
+                                        <label>City</label>
+                                    </div>
+                                    <div class="col-9">
+                                        <input type="text" class="form-control" asp-for="@Model.OrderHeader.City" />
+                                    </div>
+                                </div>
+                                <div class="row my-1">
+                                    <div class="col-3">
+                                        <label>State</label>
+                                    </div>
+                                    <div class="col-9">
+                                        <input type="text" class="form-control" asp-for="@Model.OrderHeader.State"/>
+                                    </div>
+                                </div>
+                                <div class="row my-1">
+                                    <div class="col-3">
+                                        <label>Postal Code</label>
+                                    </div>
+                                    <div class="col-9">
+                                        <input type="text" class="form-control" asp-for="@Model.OrderHeader.PostalCode"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-12 col-lg-5 offset-lg-1">
+                                <h4 class="d-flex justify-content-between align-items-center mb-3">
+                                    <span class="text-info">Order Summary:</span>
+                                </h4>
+                                <ul class="list-group mb-3">
+                                    @foreach (var list in Model.ListCart)
+                                        {
+                                        <li class="list-group-item d-flex justify-content-between">
+                                            <div>
+                                                <h6 class="my-0">@list.Product.Title</h6>
+                                                <small class="text-muted">Quantity: @list.Count</small>
+                                            </div>
+                                            <span class="text-muted">$ @(list.Price* list.Count)</span>
+                                        </li>
+                                        }
+                                   
+                                    <li class="list-group-item d-flex justify-content-between bg-light">
+                                        <small class="text-info">Total (USD)</small>
+                                        <strong class="text-info">$ @Model.OrderHeader.OrderTotal</strong>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <div class="row">
+                        <div class="col-12 col-md-8 pt-2">
+                            <p style="color:maroon; font-size:14px;">Estimate Arrival Date: @DateTime.Now.AddDays(7).ToShortDateString() - @DateTime.Now.AddDays(14).ToShortDateString()</p>
+                        </div>
+                        <div class="col-12 col-md-4">
+                            @* paypal button *@
+                            <div id="paypal-button-container" class="mb-2"></div>
+
+                            <p class="text-center my-2"><b>OR</b></p>
+                            @* Stripe button *@
+                            <script src="https://checkout.stripe.com/checkout.js"
+                                    class="stripe-button"
+                                    data-key="@stripe.Value.Publishablekey"
+                                    data-amount="@((Model.OrderHeader.OrderTotal * 100))"
+                                    data-name="Book Shopping Project"
+                                    data-description="GetBook For Testing"
+                                    data-locale="auto"
+                                    data-allow-remember-me="false"
+                                    data-image="https://stripe.com/img/documentation/checkout/marketplace.png">
+                            </script>
+
+                            <script>
+                                var el = document.getElementsByClassName("stripe-button-el");
+                                if (el.length > 0) {
+                                    el[0].style.display = "none";
+                                }
+                            </script>
+
+                            <button type="submit" name="paymentMethod" value="stripe"
+                                    class="btn btn-success form-control mt-2"
+                                    onclick="document.getElementsByClassName('stripe-button-el')[0].click()">
+                                Pay via Stripe
+                            </button>
+                            @* <p class="text-center my-2"><b>OR</b></p> *@
+                            @* Scan via razorpay
+                            <button type="submit"  name="paymentMethod" value="Scanner" class="btn btn-success form-control">
+                                Pay with Scanner / UPI QR
+                                </button> *@
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+
+@section Scripts{
+    <script>
+        $(document).ready(function () {
+            $("#addressDropdown").change(function () {
+                var selectedValue = $(this).val();
+
+                if (selectedValue === "live") {
+                    getCurrentLocation();
+                }
+                else {
+                    var street = $(this).find(":selected").data("street");
+                    $("#streetAddress").val(street);
+                }
+            });
+        });
+    </script>
+
+ @* To fetch the detail of that address that user select in dropdown list and current location then fill in the text box  *@
+   
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const dropdown = document.getElementById("addressDropdown");
+            const checkbox = document.getElementById("useCurrentLocation");
+
+            function fillFromDropdown() {
+                let selected = dropdown.options[dropdown.selectedIndex];
+
+                document.getElementById("OrderHeader_Name").value = selected.dataset.name || "";
+                document.getElementById("OrderHeader_PhoneNumber").value = selected.dataset.phone || "";
+                document.getElementById("OrderHeader_StreetAddress").value = selected.dataset.street || "";
+                document.getElementById("OrderHeader_City").value = selected.dataset.city || "";
+                document.getElementById("OrderHeader_State").value = selected.dataset.state || "";
+                document.getElementById("OrderHeader_PostalCode").value = selected.dataset.postal || "";
+            }
+            // fetch LiveLocation via openstreetmap
+            function getCurrentLocation() {
+                if (!navigator.geolocation) {
+                    alert("Geolocation is not supported by your browser.");
+                    checkbox.checked = false;
+                    return;
+                }
+
+                navigator.geolocation.getCurrentPosition(
+                    async function (position) {
+                        let lat = position.coords.latitude;
+                        let lon = position.coords.longitude;
+
+                        let res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lon}`);
+                        let data = await res.json();
+                        let a = data.address || {};
+
+                        document.getElementById("OrderHeader_StreetAddress").value =
+                            ((a.road || "") + " " + (a.suburb || "")).trim();
+                        document.getElementById("OrderHeader_City").value =
+                            a.city || a.town || a.village || "";
+                        document.getElementById("OrderHeader_State").value = a.state || "";
+                        document.getElementById("OrderHeader_PostalCode").value = a.postcode || "";
+                    },
+                    function () {
+                        alert("Location not found");
+                        checkbox.checked = false;
+                        dropdown.disabled = false;
+                        fillFromDropdown();
+                    }
+                );
+            }
+
+            dropdown.addEventListener("change", function () {
+                if (!checkbox.checked) {
+                    fillFromDropdown();
+                }
+            });
+
+            checkbox.addEventListener("change", function () {
+                if (this.checked) {
+                    dropdown.disabled = true;
+                    getCurrentLocation();
+                } else {
+                    dropdown.disabled = false;
+                    fillFromDropdown();
+                }
+            });
+
+            fillFromDropdown();
+        });
+    </script>
+
+    @* PayPal Payment method JS *@
+    <script src="https://www.paypal.com/sdk/js?client-id=@PayPal.Value.ClientId&currency=USD&enable-funding=venmo,paylater"></script>
+<script>
+        //Store paypal response -Approved or Rejected
+        const submitPayPal = (data, status) => {
+            let f = document.getElementById("paymentForm");   // Get form by id
+            f.action = '/Customer/Cart/PayPalCheckOut';       //redirect to action PayPalCheckOut
+           
+            // ["paypalTransactionId","paypalPaymentResult"].forEach(id => {
+            //     let el = document.getElementById(id);
+            //     if (el) el.remove();
+            // });
+
+            //if payment approaved and create hidden transaction id then send this id to the controller
+            if (data) {
+                let t = document.createElement("input");
+                t.type = "hidden";
+                t.name = "transactionId";
+                t.id = "paypalTransactionId";
+                t.value = data.id;
+                f.appendChild(t);
+            }
+            //Send the payment result to the controller - rejected or approaved
+            let p = document.createElement("input");
+            p.type = "hidden";
+            p.name = "paymentResult";
+            p.id = "paypalPaymentResult";
+            p.value = status;
+            f.appendChild(p);
+            //sent this form to the controller
+            f.submit();
+        };
+        //create the UI of paypal button
+        paypal.Buttons({
+            createOrder: (d, a) => a.order.create({
+                purchase_units: [{ amount: { value: '@Model.OrderHeader.OrderTotal.ToString("0.00")' } }]
+            }),
+            //work according to the payment status
+         onApprove: function (data, actions) {
+         // Don't use actions.order.capture() - just submit the orderID directly
+         var form = document.getElementById("paymentForm");
+    
+         var hiddenInput = document.createElement("input");
+         hiddenInput.setAttribute("type", "hidden");
+         hiddenInput.setAttribute("name", "transactionId");
+         hiddenInput.setAttribute("value", data.orderID); // ← use data.orderID not details.id
+         form.appendChild(hiddenInput);
+    
+          form.submit();
+         },
+         onCancel: () => submitPayPal(null, "Rejected"),
+         onError: () => submitPayPal(null, "Rejected")
+        }).render('#paypal-button-container');
+    </script>
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <script>
+        @if (TempData["Error"] != null)
+        {
+                <text>
+                    toastr.error("@TempData["Error"]");
+                </text>
+        }
+    </script>
+}

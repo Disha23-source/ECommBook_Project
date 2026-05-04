@@ -1,0 +1,240 @@
+﻿@model IEnumerable<EComm_Project_Models.OrderHeader>
+
+@{
+    ViewData["Title"] = "Datewise Orders";
+}
+
+<div class="container-fluid mt-4 px-4">
+
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold text-primary mb-0">
+                <i class="bi bi-calendar-range me-2"></i>Datewise Orders
+            </h2>
+            <p class="text-muted mb-0">Filter orders by date range and status</p>
+        </div>
+        <a asp-action="AllOrders" class="btn btn-outline-secondary text-primary">
+            <i class="bi bi-list-ul me-1"></i> All Orders
+        </a>
+    </div>
+
+    <!-- Search Filter Card -->
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-header bg-primary text-white">
+            <h6 class="mb-0"><i class="bi bi-funnel-fill me-2"></i>Search Filters</h6>
+        </div>
+        <div class="card-body">
+            <form method="post" asp-action="DatewiseOrders" asp-area="Admin"
+                  asp-controller="OrderManagement">
+                <div class="row g-3 align-items-end">
+
+                    <!-- From Date -->
+                    <div class="col-md-3">
+                        <label class="form-label fw-semibold text-muted">
+                            <i class="bi bi-calendar-event me-1"></i>From Date
+                        </label>
+                        <input type="date" name="fromDate" id="fromDate"
+                               class="form-control"
+                               value="@ViewBag.FromDate"
+                               required />
+                    </div>
+
+                    <!-- To Date -->
+                    <div class="col-md-3">
+                        <label class="form-label fw-semibold text-muted">
+                            <i class="bi bi-calendar-event me-1"></i>To Date
+                        </label>
+                        <input type="date" name="toDate" id="toDate" class="form-control" value="@ViewBag.ToDate" required />
+                    </div>
+
+                    <!-- Order Status -->
+                    <div class="col-md-3">
+                        <label class="form-label fw-semibold text-muted">
+                            <i class="bi bi-tag me-1"></i>Order Status
+                        </label>
+                        <select name="orderStatus" class="form-select form-control">
+                            <option value="All" selected="@(ViewBag.Status == "All" ? "selected" : null)">All Status</option>
+                            <option value="Pending" selected="@(ViewBag.Status == "Pending" ? "selected" : null)">Pending</option>
+                            <option value="Approved" selected="@(ViewBag.Status == "Approved" ? "selected" : null)">Approved</option>
+                            <option value="Cancelled" selected="@(ViewBag.Status == "Cancelled" ? "selected" : null)">Cancelled</option>
+                            <option value="Rejected" selected="@(ViewBag.Status == "Rejected" ? "selected" : null)">Rejected</option>
+                            <option value="Refunded" selected="@(ViewBag.Status == "Refunded" ? "selected" : null)">Refunded</option>
+                        </select>
+                    </div>
+
+                    <!-- Search Button -->
+                    <div class="col-md-3">
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="bi bi-search me-2"></i>Search Orders
+                        </button>
+                    </div>
+
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Results Section — only shows after search -->
+    @if (ViewBag.Searched == true)
+    {
+        @if (Model != null && Model.Any())
+        {
+            <!-- Summary Stats Row -->
+            <div class="row g-3 mb-4">
+                <div class="col-md-3">
+                    <div class="card border-0 shadow-sm text-center p-3"
+                         style="border-left:4px solid #0d6efd !important;">
+                        <div class="text-muted small">Total Orders</div>
+                        <div class="fs-3 fw-bold text-primary">@Model.Count()</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card border-0 shadow-sm text-center p-3"
+                         style="border-left:4px solid #198754 !important;">
+                        <div class="text-muted small">Approved Orders</div>
+                        <div class="fs-3 fw-bold text-success">
+                            @Model.Count(o => o.OrderStatus == "Approved")
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card border-0 shadow-sm text-center p-3"
+                         style="border-left:4px solid #ffc107 !important;">
+                        <div class="text-muted small">Pending Orders</div>
+                        <div class="fs-3 fw-bold text-warning">
+                            @Model.Count(o => o.OrderStatus == "Pending")
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card border-0 shadow-sm text-center p-3"
+                         style="border-left:4px solid #dc3545 !important;">
+                        <div class="text-muted small">Grand Total</div>
+                        <div class="fs-4 fw-bold text-danger">
+                            ₹@ViewBag.GrandTotal.ToString("N2")
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Results Table -->
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0">
+                        <i class="bi bi-table me-2"></i>
+                        Orders from @ViewBag.FromDate to @ViewBag.ToDate
+                        @if (ViewBag.Status != "All")
+                        {
+                            <span class="badge bg-light text-primary ms-2">@ViewBag.Status</span>
+                        }
+                    </h6>
+                    <span class="badge bg-light text-primary">@Model.Count() orders found</span>
+                </div>
+                <div class="card-body p-0">
+                    <table class="table table-hover mb-0" id="datewiseTable">
+                        <thead class="table-primary">
+                            <tr>
+                                <th class="ps-3">Order ID</th>
+                                <th>Order Date</th>
+                                <th>Customer Name</th>
+                                <th>Email</th>
+                                <th>Order Status</th>
+                                <th>Payment Status</th>
+                                <th class="text-end">Total Amount</th>
+                                <th class="text-center">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var order in Model.OrderByDescending(o => o.OrderDate))
+                            {
+                                <tr>
+                                    <td class="ps-3">
+                                        <span class="badge bg-secondary">#@order.Id</span>
+                                    </td>
+                                    <td>@order.OrderDate.ToString("MMM dd, yyyy")</td>
+                                    <td><strong>@order.Name</strong></td>
+                                    <td class="text-muted small">@order.ApplicationUser?.Email</td>
+                                    <td>
+                                        @{
+                                            var oBadge = order.OrderStatus switch
+                                            {
+                                                "Approved" or "Shipped" => "bg-success",
+                                                "Pending" => "bg-warning text-dark",
+                                                "Cancelled" => "bg-danger",
+                                                "Rejected" => "bg-danger",
+                                                "Refunded" => "bg-info text-dark",
+                                                _ => "bg-secondary"
+                                            };
+                                        }
+                                        <span class="badge @oBadge">@order.OrderStatus</span>
+                                    </td>
+                                    <td>
+                                        @{
+                                            var pBadge = order.PaymentStatus switch
+                                            {
+                                                "Approved" => "bg-success",
+                                                "Pending" => "bg-warning text-dark",
+                                                "Rejected" => "bg-danger",
+                                                "Refunded" => "bg-info text-dark",
+                                                _ => "bg-secondary"
+                                            };
+                                        }
+                                        <span class="badge @pBadge">@order.PaymentStatus</span>
+                                    </td>
+                                    <td class="text-end">
+                                        <strong>₹@order.OrderTotal.ToString("N2")</strong>
+                                    </td>
+                                    <td class="text-center">
+                                        <a asp-action="Details"
+                                           asp-route-orderId="@order.Id"
+                                           class="btn btn-sm btn-outline-primary">
+                                            <i class="bi bi-eye-fill"></i> View
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                        <!-- Grand Total Footer -->
+                        <tfoot>
+                            <tr class="table-dark fw-bold">
+                                <td colspan="6" class="text-end ps-3 py-3 fs-6">
+                                    💰 Grand Total of Orders :
+                                </td>
+                                <td class="text-end py-3">
+                                    <span class="fs-5 text-warning">
+                                        ₹@ViewBag.GrandTotal.ToString("N2")
+                                    </span>
+                                </td>
+                                <td></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        }
+        else
+        {
+            <!-- No Results -->
+            <div class="card shadow-sm border-0">
+                <div class="card-body text-center py-5">
+                    <i class="bi bi-inbox text-muted" style="font-size: 4rem;"></i>
+                    <h4 class="text-muted mt-3">No Orders Found</h4>
+                    <p class="text-muted">
+                        No orders found between <strong>@ViewBag.FromDate</strong>
+                        and <strong>@ViewBag.ToDate</strong>
+                        @if (ViewBag.Status != "All")
+                        {
+                            <span>with status <strong>@ViewBag.Status</strong></span>
+                        }
+                    </p>
+                </div>
+            </div>
+        }
+    }
+
+</div>
+
+@section Scripts{
+    <script src="~/js/datewiseOrder.js"></script>
+}

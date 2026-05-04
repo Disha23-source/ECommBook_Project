@@ -1,0 +1,35 @@
+﻿@{
+    ViewData["Title"] = "All Orders";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row border p-2 m-2">
+    <h2 class="text-primary">ALL ORDERS</h2>
+</div>
+
+<div class="container-fluid rounded border p-2 m-2">
+    <table class="table table-bordered table-hover w-100" id="tblData">
+        <thead class="table-primary">
+            <tr>
+                <th>Order ID</th>      @* column 0 *@
+                <th>Order Date</th>    @* column 1 *@
+                <th>Customer Name</th> @* column 2 *@
+                <th>Total Amount</th>  @* column 3 *@
+                <th>Action</th>        @* column 4 *@
+            </tr>
+        </thead>
+        <tbody></tbody>
+        <tfoot>
+            <tr class="table-dark fw-bold">
+                <td colspan="3" class="text-end">💰 Order Totals :</td>
+                <td></td>  @* column index 3 — footerCallback targets this *@
+                <td></td>
+            </tr>
+        </tfoot>
+    </table>
+</div>
+
+@section Scripts {
+    
+    <script src="~/js/order.js"></script>
+}

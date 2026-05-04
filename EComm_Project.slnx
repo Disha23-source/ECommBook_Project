@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="EComm_Project/EComm_Project.csproj" />
+  <Project Path="EComm_Project_DataAccess/EComm_Project_DataAccess.csproj" />
+  <Project Path="EComm_Project_Models/EComm_Project_Models.csproj" />
+  <Project Path="EComm_Project_Utility/EComm_Project_Utility.csproj" />
+</Solution>

@@ -1,0 +1,18 @@
+﻿@model EComm_Project_Models.OrderHeader
+
+<div class="container text-center mt-4">
+    <h2>Scan & Pay</h2>
+
+    <p>Order No: <b>@Model.Id</b></p>
+    <p>Amount: <b>₹@Model.OrderTotal</b></p>
+
+    <img src="~/images/upi-qr.png" width="300" class="border p-2" />
+
+    <p class="mt-3 text-muted">
+        After payment, admin will verify and approve your order.
+    </p>
+
+    <a asp-action="OrderConfirmation" asp-route-id="@Model.Id" class="btn btn-primary">
+        I Have Paid
+    </a>
+</div>
