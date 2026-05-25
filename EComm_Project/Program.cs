@@ -42,36 +42,32 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.LogoutPath = $"/Identity/Account/Logout";
 });
 
-// For OAuth of Facebook and Google
-builder.Services.AddAuthentication().AddFacebook(options =>
-{
-    options.AppId = "948252274667626";
-    options.AppSecret = "ddb0019bd605cb5455f6a68ef75d3329";
-});
-
-builder.Services.AddAuthentication().AddGoogle(options =>
-{
-    options.ClientId = "255880690319-1rort58j57f8kkg3l3lauebniscgaa5j.apps.googleusercontent.com";
-    options.ClientSecret = "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";
-});
-
-builder.Services.AddAuthentication().AddLinkedIn(options =>
-{
-    options.ClientId = "863zgbji4sd7tk";
-    options.ClientSecret = "WPL_AP1.clZiwDsoyTk5IlGf.aGMkUw==";
-});
-
-builder.Services.AddAuthentication().AddTwitter(options =>
-{
-    options.ConsumerKey = "Gcby86w1bNFYaTAnD25dQwa9C";
-    options.ConsumerSecret = "fsP0i2kzRHD6Yh4jaUDzxTQfTDfJL0ky4Pl0LVSPDPhxHf98xZ";
-});
-
-builder.Services.AddAuthentication().AddGitHub(options =>
-{
-    options.ClientId = "Ov23lifTtulz9tfK883T";
-    options.ClientSecret = "781d583c24f39b5555119e3eef28c2c69f935378";
-});
+builder.Services.AddAuthentication()
+    .AddFacebook(options =>
+    {
+        options.AppId = builder.Configuration["Authentication:Facebook:AppId"];
+        options.AppSecret = builder.Configuration["Authentication:Facebook:AppSecret"];
+    })
+    .AddGoogle(options =>
+    {
+        options.ClientId = builder.Configuration["Authentication:Google:ClientId"];
+        options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
+    })
+    .AddLinkedIn(options =>
+    {
+        options.ClientId = builder.Configuration["Authentication:LinkedIn:ClientId"];
+        options.ClientSecret = builder.Configuration["Authentication:LinkedIn:ClientSecret"];
+    })
+    .AddTwitter(options =>
+    {
+        options.ConsumerKey = builder.Configuration["Authentication:Twitter:ConsumerKey"];
+        options.ConsumerSecret = builder.Configuration["Authentication:Twitter:ConsumerSecret"];
+    })
+    .AddGitHub(options =>
+    {
+        options.ClientId = builder.Configuration["Authentication:GitHub:ClientId"];
+        options.ClientSecret = builder.Configuration["Authentication:GitHub:ClientSecret"];
+    });
 
 //Configure the session variables
 builder.Services.AddSession(options =>
@@ -95,13 +91,16 @@ builder.Services.Configure<RazorpaySettings>(builder.Configuration.GetSection("R
 
 builder.Services.AddTransient<ISendOtpRepository, SendOtpRepository>();
 
-// This MUST be there — without it GetAll() returns empty due to circular reference
+//Configure the calender code to not enable to select the date before the fromdate (in todate)
 builder.Services.AddControllersWithViews()
-    .AddJsonOptions(options => {
+    .AddJsonOptions(options =>
+    {
         options.JsonSerializerOptions.ReferenceHandler =
             System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
     });
-
+//Added the APi id in secret.json
+var stripeKey = builder.Configuration["StrpieSettings:Secretkey"];
+var twilioToken = builder.Configuration["TwilioSettings:AuthToken"];
 //MiddleWare - TopDown Approach
 var app = builder.Build();
 // Configure the HTTP request pipeline.

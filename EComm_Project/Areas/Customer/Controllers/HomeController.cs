@@ -97,5 +97,45 @@ namespace EComm_Project.Areas.Customer.Controllers
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
+        //For search bar and category dropdown list in nav bar
+        // Live search endpoint
+        [HttpGet]
+        public IActionResult SearchSuggestions(string query)
+        {
+            if (string.IsNullOrWhiteSpace(query))
+                return Json(new List<object>());
+
+            var results = _unitOfWork.Product.GetAll(includeProperties: "Category")
+                .Where(p => p.Title.Contains(query, StringComparison.OrdinalIgnoreCase) ||
+                            p.Author.Contains(query, StringComparison.OrdinalIgnoreCase))
+                .Take(6)
+                .Select(p => new { p.Id, p.Title, p.Author, p.ImageUrl })
+                .ToList();
+
+            return Json(results);
+        }
+
+        // Full search results page
+        [HttpGet]
+        public IActionResult Search(string query)
+        {
+            var results = _unitOfWork.Product.GetAll(includeProperties: "Category")
+                .Where(p => p.Title.Contains(query, StringComparison.OrdinalIgnoreCase) ||
+                            p.Author.Contains(query, StringComparison.OrdinalIgnoreCase))
+                .ToList();
+
+            ViewBag.Query = query;
+            return View(results);
+        }
+
+        // Categories for dropdown
+        [HttpGet]
+        public IActionResult GetCategories()
+        {
+            var categories = _unitOfWork.Category.GetAll()
+                .Select(c => new { c.Id, c.Name })
+                .ToList();
+            return Json(categories);
+        }
     }
 }

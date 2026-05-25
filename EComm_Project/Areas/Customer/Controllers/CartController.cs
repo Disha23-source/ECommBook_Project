@@ -206,9 +206,7 @@ namespace EComm_Project.Areas.Customer.Controllers
             ShoppingCartVM.ListCart = _unitOfWork.ShoppingCart.GetAll(sc => sc.ApplicationUserId == claims.Value && selectedIds.Contains(sc.Id),
                 includeProperties: "Product").ToList();
 
-            //To fetch all item from database
-            //ShoppingCartVM.ListCart = _unitOfWork.ShoppingCart.GetAll(sc => sc.ApplicationUserId == claims.Value, includeProperties: "Product");
-
+            
             ShoppingCartVM.OrderHeader.ApplicationUser = _unitOfWork.ApplicationUser.FirstOrDefault(au => au.Id == claims.Value);
 
             ShoppingCartVM.OrderHeader.OrderStatus = SD.OrderStatusPending;
@@ -282,18 +280,7 @@ namespace EComm_Project.Areas.Customer.Controllers
             
            
 
-            ////RazorPay Code-QR
-            //if (paymentMethod == "Scanner")
-            //{
-            //    ShoppingCartVM.OrderHeader.PaymentStatus = SD.PaymentStatusPending;
-            //    ShoppingCartVM.OrderHeader.OrderStatus = SD.OrderStatusPending;
-
-            //    _unitOfWork.OrderHeader.Add(ShoppingCartVM.OrderHeader);
-            //    _unitOfWork.Save();
-
-            //    return RedirectToAction(nameof (ScannerPayment), new { id = ShoppingCartVM.OrderHeader.Id });
-                
-            //}
+  
             SendOrderSms(); //SMS method called here
             return RedirectToAction("OrderConfirmation", "Cart", new { id = ShoppingCartVM.OrderHeader.Id });
         }

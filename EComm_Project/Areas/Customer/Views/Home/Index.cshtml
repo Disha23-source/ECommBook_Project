@@ -1,33 +1,629 @@
 ﻿@model IEnumerable<EComm_Project_Models.Product>
 
-<div class="book-container py-5">
-    <div class="container">
-        <!-- Using Bootstrap's grid with custom gutter spacing -->
-        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
-            @foreach (var product in Model)
-            {
-                <div class="col">
-                    <div class="modern-book-card">
-                        <div class="book-img-wrapper">
-                            <img src="@product.ImageUrl" class="book-img" alt="@product.Title" />
-                        </div>
+@{
+    ViewData["Title"] = "BookShelf - Discover Your Next Read";
+}
 
-                        <div class="book-info">
-                            <h2 class="book-title">@product.Title</h2>
-                            <p class="book-author">by @product.Author</p>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 
-                            <div class="price-section">
-                                <span class="list-price">$@product.ListPrice.ToString("0.00")</span>
-                                <span class="current-price">$@product.Price100.ToString("0.00")</span>
-                            </div>
+<style>
+    :root {
+        --ink: #0f0e0e;
+        --cream: #faf7f2;
+        --parchment: #f0ead8;
+        --amber: #e8a020;
+        --amber-light: #ffc84a;
+        --rust: #c0392b;
+        --sage: #4a6741;
+        --muted: #7a7068;
+        --card-bg: #ffffff;
+        --border: #e8e0d0;
+        --shadow: 0 8px 32px rgba(15,14,14,0.10);
+        --shadow-hover: 0 20px 60px rgba(15,14,14,0.18);
+    }
 
-                            <a asp-action="Details" asp-route-productId="@product.Id" class="btn btn-modern-action">
-                                View Product
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            }
-        </div>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+        background: var(--cream);
+        font-family: 'DM Sans', sans-serif;
+        color: var(--ink);
+        overflow-x: hidden;
+    }
+
+    /* ───── HERO STRIP ───── */
+    .hero-strip {
+        background: var(--ink);
+        color: var(--cream);
+        padding: 72px 40px 56px;
+        position: relative;
+        overflow: hidden;
+    }
+    .hero-strip::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: repeating-linear-gradient(
+            -45deg,
+            transparent,
+            transparent 40px,
+            rgba(255,255,255,0.02) 40px,
+            rgba(255,255,255,0.02) 80px
+        );
+    }
+    .hero-strip .tagline {
+        font-family: 'Playfair Display', serif;
+        font-size: clamp(2.4rem, 5vw, 4rem);
+        font-weight: 900;
+        line-height: 1.1;
+        letter-spacing: -0.02em;
+        max-width: 640px;
+        position: relative;
+    }
+    .hero-strip .tagline em {
+        font-style: italic;
+        color: var(--amber-light);
+    }
+    .hero-strip .sub {
+        margin-top: 16px;
+        font-size: 1rem;
+        color: rgba(250,247,242,0.6);
+        font-weight: 300;
+        position: relative;
+    }
+    .hero-deco {
+        position: absolute;
+        right: -60px;
+        top: -40px;
+        width: 420px;
+        height: 420px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(232,160,32,0.18) 0%, transparent 70%);
+        pointer-events: none;
+    }
+
+    /* ───── SEARCH BAR ───── */
+    .search-section {
+        background: var(--ink);
+        padding: 0 40px 40px;
+    }
+    .search-wrapper {
+        max-width: 680px;
+        position: relative;
+    }
+    .search-wrapper input {
+        width: 100%;
+        padding: 16px 56px 16px 24px;
+        border: 2px solid rgba(255,255,255,0.15);
+        border-radius: 60px;
+        background: rgba(255,255,255,0.07);
+        color: var(--cream);
+        font-family: 'DM Sans', sans-serif;
+        font-size: 0.95rem;
+        outline: none;
+        transition: border-color 0.25s, background 0.25s;
+    }
+    .search-wrapper input::placeholder { color: rgba(250,247,242,0.4); }
+    .search-wrapper input:focus {
+        border-color: var(--amber);
+        background: rgba(255,255,255,0.11);
+    }
+    .search-wrapper .search-icon {
+        position: absolute;
+        right: 20px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--amber);
+        font-size: 1.1rem;
+        pointer-events: none;
+    }
+    #searchResults {
+        position: absolute;
+        top: calc(100% + 8px);
+        left: 0;
+        right: 0;
+        background: var(--card-bg);
+        border-radius: 16px;
+        box-shadow: var(--shadow-hover);
+        overflow: hidden;
+        z-index: 200;
+        display: none;
+    }
+    #searchResults.active { display: block; }
+    .search-result-item {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 12px 20px;
+        cursor: pointer;
+        transition: background 0.15s;
+        border-bottom: 1px solid var(--border);
+    }
+    .search-result-item:last-child { border-bottom: none; }
+    .search-result-item:hover { background: var(--parchment); }
+    .search-result-item img {
+        width: 36px;
+        height: 50px;
+        object-fit: cover;
+        border-radius: 4px;
+        flex-shrink: 0;
+    }
+    .search-result-item .sri-info .sri-title {
+        font-family: 'Playfair Display', serif;
+        font-size: 0.9rem;
+        font-weight: 700;
+        color: var(--ink);
+    }
+    .search-result-item .sri-info .sri-author {
+        font-size: 0.78rem;
+        color: var(--muted);
+    }
+    .no-results {
+        padding: 20px;
+        text-align: center;
+        color: var(--muted);
+        font-size: 0.9rem;
+    }
+
+    /* ───── SECTION HEADER ───── */
+    .section-header {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        padding: 48px 40px 24px;
+    }
+    .section-title {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.9rem;
+        font-weight: 900;
+        letter-spacing: -0.02em;
+    }
+    .section-title span { color: var(--amber); }
+    .carousel-nav {
+        display: flex;
+        gap: 10px;
+    }
+    .carousel-btn {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        border: 2px solid var(--ink);
+        background: transparent;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
+        transition: background 0.2s, color 0.2s, transform 0.15s;
+    }
+    .carousel-btn:hover {
+        background: var(--ink);
+        color: var(--cream);
+        transform: scale(1.05);
+    }
+
+    /* ───── CAROUSEL ───── */
+    .carousel-track-wrapper {
+        padding: 0 40px 56px;
+        overflow: hidden;
+        position: relative;
+    }
+    .carousel-track {
+        display: flex;
+        gap: 24px;
+        transition: transform 0.55s cubic-bezier(0.4, 0, 0.2, 1);
+        will-change: transform;
+    }
+
+    /* ───── BOOK CARD ───── */
+    .book-card {
+        flex: 0 0 calc(25% - 18px);
+        background: var(--card-bg);
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: var(--shadow);
+        transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.35s;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+    }
+    .book-card:hover {
+        transform: translateY(-10px) scale(1.01);
+        box-shadow: var(--shadow-hover);
+    }
+
+    .book-card-img {
+        position: relative;
+        aspect-ratio: 3/4;
+        overflow: hidden;
+        background: var(--parchment);
+    }
+    .book-card-img img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        display: block;
+    }
+    .book-card:hover .book-card-img img { transform: scale(1.07); }
+
+    .discount-badge {
+        position: absolute;
+        top: 14px;
+        left: 14px;
+        background: var(--rust);
+        color: #fff;
+        font-size: 0.7rem;
+        font-weight: 700;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        padding: 5px 10px;
+        border-radius: 30px;
+        z-index: 2;
+    }
+
+    .book-card-overlay {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(to top, rgba(15,14,14,0.7) 0%, transparent 50%);
+        opacity: 0;
+        transition: opacity 0.35s;
+        display: flex;
+        align-items: flex-end;
+        padding: 20px;
+    }
+    .book-card:hover .book-card-overlay { opacity: 1; }
+    .quick-view-btn {
+        width: 100%;
+        padding: 11px;
+        border: 2px solid rgba(255,255,255,0.9);
+        background: transparent;
+        color: #fff;
+        border-radius: 40px;
+        font-family: 'DM Sans', sans-serif;
+        font-size: 0.82rem;
+        font-weight: 600;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition: background 0.2s;
+        text-align: center;
+        text-decoration: none;
+        display: block;
+    }
+    .quick-view-btn:hover { background: rgba(255,255,255,0.15); color: #fff; }
+
+    .book-card-body {
+        padding: 20px 22px 24px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        flex: 1;
+    }
+    .book-card-title {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.05rem;
+        font-weight: 700;
+        line-height: 1.3;
+        color: var(--ink);
+    }
+    .book-card-author {
+        font-size: 0.8rem;
+        color: var(--muted);
+        font-weight: 400;
+    }
+    .book-card-author span { color: var(--sage); font-weight: 600; }
+
+    .price-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-top: 8px;
+    }
+    .price-now {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: var(--ink);
+        font-family: 'Playfair Display', serif;
+    }
+    .price-was {
+        font-size: 0.82rem;
+        color: var(--muted);
+        text-decoration: line-through;
+    }
+
+    .btn-buy {
+        margin-top: 14px;
+        padding: 13px 20px;
+        background: var(--ink);
+        color: var(--cream);
+        border: none;
+        border-radius: 12px;
+        font-family: 'DM Sans', sans-serif;
+        font-size: 0.82rem;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        cursor: pointer;
+        text-align: center;
+        text-decoration: none;
+        display: block;
+        transition: background 0.2s, transform 0.15s;
+    }
+    .btn-buy:hover {
+        background: var(--amber);
+        color: var(--ink);
+        transform: translateY(-1px);
+        text-decoration: none;
+    }
+
+    /* ───── CAROUSEL DOTS ───── */
+    .carousel-dots {
+        display: flex;
+        justify-content: center;
+        gap: 8px;
+        padding-bottom: 48px;
+    }
+    .dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--border);
+        border: none;
+        cursor: pointer;
+        transition: background 0.2s, transform 0.2s;
+        padding: 0;
+    }
+    .dot.active {
+        background: var(--ink);
+        transform: scale(1.3);
+    }
+
+    /* ───── NO RESULTS ───── */
+    .no-books-found {
+        text-align: center;
+        padding: 80px 40px;
+        display: none;
+    }
+    .no-books-found.visible { display: block; }
+    .no-books-found .nf-icon {
+        font-size: 3.5rem;
+        margin-bottom: 16px;
+    }
+    .no-books-found h3 {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.6rem;
+        margin-bottom: 8px;
+    }
+    .no-books-found p { color: var(--muted); font-size: 0.95rem; }
+
+    /* ───── RESPONSIVE ───── */
+    @@media (max-width: 1100px) {
+        .book-card { flex: 0 0 calc(33.33% - 16px); }
+    }
+    @@media (max-width: 768px) {
+        .hero-strip, .search-section { padding-left: 20px; padding-right: 20px; }
+        .section-header, .carousel-track-wrapper { padding-left: 20px; padding-right: 20px; }
+        .book-card { flex: 0 0 calc(50% - 12px); }
+        .hero-strip .tagline { font-size: 2rem; }
+    }
+    @@media (max-width: 480px) {
+        .book-card { flex: 0 0 calc(85vw); }
+    }
+
+    /* ───── ENTRY ANIMATIONS ───── */
+    @@keyframes fadeUp {
+        from { opacity: 0; transform: translateY(28px); }
+        to   { opacity: 1; transform: translateY(0); }
+    }
+    .book-card {
+        animation: fadeUp 0.5s ease both;
+    }
+</style>
+
+<!-- HERO -->
+<div class="hero-strip">
+    <div class="hero-deco"></div>
+    <div class="tagline">Stories that <em>move</em> you.<br>Prices that won't.</div>
+    <p class="sub">Curated books at unbeatable prices — delivered to your door.</p>
+</div>
+
+<!-- SEARCH -->
+<div class="search-section">
+    <div class="search-wrapper">
+        <input type="text" id="liveSearch" placeholder="Search by title or author…" autocomplete="off" />
+        <span class="search-icon">&#9906;</span>
+        <div id="searchResults"></div>
     </div>
 </div>
+
+<!-- SECTION HEADER -->
+<div class="section-header">
+    <h2 class="section-title">Featured <span>Books</span></h2>
+    <div class="carousel-nav">
+        <button class="carousel-btn" id="prevBtn" aria-label="Previous">&#8592;</button>
+        <button class="carousel-btn" id="nextBtn" aria-label="Next">&#8594;</button>
+    </div>
+</div>
+
+<!-- CAROUSEL -->
+<div class="carousel-track-wrapper">
+    <div class="carousel-track" id="carouselTrack">
+        @{
+            var productList = Model.ToList();
+        }
+        @foreach (var product in productList)
+        {
+            var discountPct = product.ListPrice > 0
+                ? (int)Math.Round((1 - (double)product.Price100 / (double)product.ListPrice) * 100)
+                : 0;
+            <div class="book-card" data-title="@product.Title.ToLower()" data-author="@product.Author.ToLower()">
+                <div class="book-card-img">
+                    @if (discountPct > 0)
+                    {
+                        <div class="discount-badge">-@discountPct%</div>
+                    }
+                    <img src="@product.ImageUrl" alt="@product.Title" loading="lazy" />
+                    <div class="book-card-overlay">
+                        <a asp-action="Details" asp-route-id="@product.Id" class="quick-view-btn">View Details</a>
+                    </div>
+                </div>
+                <div class="book-card-body">
+                    <div class="book-card-title">@product.Title</div>
+                    <div class="book-card-author">by <span>@product.Author</span></div>
+                    <div class="price-row">
+                        <span class="price-now">$@product.Price100.ToString("0.00")</span>
+                        @if (product.ListPrice != product.Price100)
+                        {
+                            <span class="price-was">$@product.ListPrice.ToString("0.00")</span>
+                        }
+                    </div>
+                    <a asp-action="Details" asp-route-id="@product.Id" class="btn-buy">View Product</a>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<!-- NO RESULTS -->
+<div class="no-books-found" id="noBooksMsg">
+    <div class="nf-icon">📚</div>
+    <h3>No books found</h3>
+    <p>Try searching for a different title or author.</p>
+</div>
+
+<!-- DOTS -->
+<div class="carousel-dots" id="carouselDots"></div>
+
+<script>
+(function () {
+    /* ── DATA ── */
+    const products = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(productList.Select(p => new {
+        id = p.Id,
+        title = p.Title,
+        author = p.Author,
+        imageUrl = p.ImageUrl,
+        price = p.Price100,
+        listPrice = p.ListPrice
+    })));
+
+    /* ── CAROUSEL ── */
+    const track   = document.getElementById('carouselTrack');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const dotsEl  = document.getElementById('carouselDots');
+
+    let current = 0;
+    let visibleCount = getVisible();
+    const totalCards  = track.children.length;
+    const totalPages  = Math.ceil(totalCards / visibleCount);
+
+    function getVisible() {
+        if (window.innerWidth <= 480)  return 1;
+        if (window.innerWidth <= 768)  return 2;
+        if (window.innerWidth <= 1100) return 3;
+        return 4;
+    }
+
+    function cardWidth() {
+        const c = track.children[0];
+        return c ? c.offsetWidth + 24 : 0; // 24 = gap
+    }
+
+    function buildDots() {
+        dotsEl.innerHTML = '';
+        const pages = Math.ceil(totalCards / visibleCount);
+        for (let i = 0; i < pages; i++) {
+            const d = document.createElement('button');
+            d.className = 'dot' + (i === current ? ' active' : '');
+            d.addEventListener('click', () => goTo(i));
+            dotsEl.appendChild(d);
+        }
+    }
+
+    function updateDots() {
+        dotsEl.querySelectorAll('.dot').forEach((d, i) => {
+            d.classList.toggle('active', i === current);
+        });
+    }
+
+    function goTo(page) {
+        const pages = Math.ceil(totalCards / visibleCount);
+        current = Math.max(0, Math.min(page, pages - 1));
+        track.style.transform = `translateX(-${current * visibleCount * cardWidth()}px)`;
+        updateDots();
+        // stagger animation on visible cards
+        Array.from(track.children).forEach((card, i) => {
+            const inView = i >= current * visibleCount && i < (current + 1) * visibleCount;
+            card.style.animationDelay = inView ? `${(i - current * visibleCount) * 0.07}s` : '0s';
+        });
+    }
+
+    prevBtn.addEventListener('click', () => goTo(current - 1));
+    nextBtn.addEventListener('click', () => goTo(current + 1));
+
+    window.addEventListener('resize', () => {
+        visibleCount = getVisible();
+        current = 0;
+        buildDots();
+        goTo(0);
+    });
+
+    buildDots();
+    goTo(0);
+
+    /* ── LIVE SEARCH ── */
+    const input      = document.getElementById('liveSearch');
+    const resultsBox = document.getElementById('searchResults');
+    const noMsg      = document.getElementById('noBooksMsg');
+    const cards      = Array.from(track.children);
+
+    input.addEventListener('input', function () {
+        const q = this.value.trim().toLowerCase();
+
+        if (!q) {
+            resultsBox.innerHTML = '';
+            resultsBox.classList.remove('active');
+            cards.forEach(c => c.style.display = '');
+            noMsg.classList.remove('visible');
+            return;
+        }
+
+        const matches = products.filter(p =>
+            p.title.toLowerCase().includes(q) ||
+            p.author.toLowerCase().includes(q)
+        );
+
+        /* dropdown */
+        if (matches.length) {
+            resultsBox.innerHTML = matches.slice(0, 6).map(p => `
+                <div class="search-result-item" onclick="window.location='/Product/Details/${p.id}'">
+                    <img src="${p.imageUrl}" alt="${p.title}" onerror="this.style.display='none'">
+                    <div class="sri-info">
+                        <div class="sri-title">${p.title}</div>
+                        <div class="sri-author">by ${p.author}</div>
+                    </div>
+                </div>`).join('');
+        } else {
+            resultsBox.innerHTML = '<div class="no-results">No results found</div>';
+        }
+        resultsBox.classList.add('active');
+
+        /* filter cards in carousel */
+        let visible = 0;
+        cards.forEach(c => {
+            const hit = c.dataset.title.includes(q) || c.dataset.author.includes(q);
+            c.style.display = hit ? '' : 'none';
+            if (hit) visible++;
+        });
+        noMsg.classList.toggle('visible', visible === 0);
+    });
+
+    document.addEventListener('click', e => {
+        if (!e.target.closest('.search-wrapper')) {
+            resultsBox.classList.remove('active');
+        }
+    });
+})();
+</script>

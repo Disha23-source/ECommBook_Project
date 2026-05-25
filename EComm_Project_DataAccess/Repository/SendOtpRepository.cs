@@ -26,7 +26,6 @@ namespace EComm_Project_DataAccess.Repository
                 number = "+91" + number;
             }
             await MessageResource.CreateAsync(to: new PhoneNumber(number), from: new PhoneNumber(_twilio.FromPhone), body: message);
-
         }
     }
     }
